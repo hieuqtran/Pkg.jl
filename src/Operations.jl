@@ -1041,7 +1041,7 @@ function pin(ctx::Context, pkgs::Vector{PackageSpec})
     foreach(pkg -> update_package_pin!(pkg, manifest_info(ctx.env, pkg.uuid)), pkgs)
     load_other_deps!(ctx, pkgs)
     check_registered(ctx, pkgs)
-    
+
     # TODO check that versions exist ? -> I guess resolve_versions should check ?
     resolve_versions!(ctx, pkgs)
     update_manifest!(ctx, pkgs)
@@ -1051,7 +1051,7 @@ function pin(ctx::Context, pkgs::Vector{PackageSpec})
     build_versions(ctx, new)
 end
 
-update_package_free!(pkg::PackageSpec, ::Nothing) = 
+update_package_free!(pkg::PackageSpec, ::Nothing) =
     pkgerror("Trying to free a package which does not exist in the manifest")
 function update_package_free!(pkg::PackageSpec, entry::PackageEntry)
     # TODO check that `pin` and `path` do not occur in same node when reading manifest
@@ -1072,7 +1072,7 @@ end
 # split into two subfunctions ...
 function free(ctx::Context, pkgs::Vector{PackageSpec})
     foreach(pkg -> update_package_free!(pkg, manifest_info(ctx.env, pkg.uuid)), pkgs)
- 
+
     if any(pkg -> pkg.version == VersionSpec(), pkgs)
         # TODO what happens if I remove this?
         for pkg in filter(pkg -> pkg.version == VersionSpec(), pkgs)
@@ -1112,9 +1112,9 @@ function gen_test_code(testfile::String; coverage=false)
 end
 
 function with_temp_env(fn::Function, temp_env::String)
-    cache = Base.active_project()
+    cache = Base.ACTIVE_PROJECT[]
     try
-        Pkg.API.activate(temp_env)
+        Base.ACTIVE_PROJECT[] = temp_env
         fn()
     finally
         Base.ACTIVE_PROJECT[] = cache
